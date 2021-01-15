@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import defaultBoard from './default-board'
-import { saveStatePlugin, uuid } from './utils'
+import {saveStatePlugin, uuid} from './utils'
 
 Vue.use(Vuex)
 const board = JSON.parse(localStorage.getItem('board')) || defaultBoard
@@ -12,7 +12,7 @@ export default new Vuex.Store({
     board
   },
   getters: {
-    getTask (state) {
+    getTask(state) {
       return (id) => {
         for (const column of state.board.columns) {
           for (const task of column.tasks) {
@@ -23,7 +23,8 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    CREATE_TASK(state, { tasks, name }) {
+    CREATE_TASK(state, {tasks, name}) {
+      // we don't lose reference of tasks and it's still reactive.
       tasks.push({
         name,
         description: '',
@@ -33,12 +34,11 @@ export default new Vuex.Store({
     UPDATE_TASK(state, {task, key, value}) {
       task[key] = value;
       // Vue.set(task, key, value);
-    }
-  },
-  actions: {
-    createTask({ commit }, { event, tasks }) {
-      commit('CREATE_TASK', { tasks, name: event.target.value })
-      event.target.value = ''
+    },
+    MOVE_TASK(state, {from, to, taskIndex}) {
+      to.push(
+        from.splice(taskIndex, 1)[0]
+      )
     }
   }
 })

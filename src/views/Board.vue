@@ -1,14 +1,23 @@
 <template>
   <div class="board">
     <div class="flex flex-row items-start">
-      <div class="column" v-for="(column, index) of board.columns" :key="index">
+      <div
+        class="column"
+        v-for="(column, $columnIndex) of board.columns"
+        :key="$columnIndex"
+        @drop="dropTask($event, column.tasks)"
+        @dragover.prevent
+        @dragenter.prevent
+      >
         <div class="flex items-center mb-2 font-bold">
           {{ column.name }}
         </div>
         <div class="list-reset">
           <div
-            v-for="(task, index) of column.tasks"
-            :key="index"
+            v-for="(task, $taskIndex) of column.tasks"
+            :key="$taskIndex"
+            draggable="true"
+            @dragstart="pickTask($event, $taskIndex, $columnIndex)"
             @click="openTask(task.id)"
             class="task">
               <span class="w-full flex-no-shrink font-bold">{{ task.name }}</span>
@@ -44,13 +53,37 @@ export default {
   },
   methods: {
     createTask(event, tasks) {
-      this.$store.dispatch('createTask', { event, tasks })
+      this.$store.commit('CREATE_TASK', { name: event.target.value, tasks })
+      event.target.value = '';
     },
     openTask(id) {
       return this.$router.push({ name: 'task', params: { id: id}})
     },
     closeTask() {
       return this.$router.push({ name: 'board' })
+    },
+    pickTask(event, taskIndex, columnIndex) {
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.dropEffect = 'move'
+      event.dataTransfer.setData('task-index', taskIndex)
+      event.dataTransfer.setData('column-index', columnIndex)
+      /*
+        dataTransfer only accepts string
+        we could stringify the object, but we lose the reference
+        so it's gonna be different object that we have in our state
+      */
+
+    },
+    dropTask(event, tasks) {
+      const columnIndex = event.dataTransfer.getData('column-index')
+      const departureTasks = this.board.columns[columnIndex].tasks
+      const taskIndex = event.dataTransfer.getData('task-index')
+
+      this.$store.commit('MOVE_TASK', {
+        from: departureTasks,
+        to: tasks,
+        taskIndex
+      })
     }
   }
 }
