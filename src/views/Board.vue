@@ -5,9 +5,11 @@
         class="column"
         v-for="(column, $columnIndex) of board.columns"
         :key="$columnIndex"
-        @drop="dropTask($event, column.tasks)"
+        @drop="dropElement($event, column.tasks, $columnIndex)"
         @dragover.prevent
         @dragenter.prevent
+        draggable="true"
+        @dragstart.self="dragColumn($event, $columnIndex)"
       >
         <div class="flex items-center mb-2 font-bold">
           {{ column.name }}
@@ -17,7 +19,7 @@
             v-for="(task, $taskIndex) of column.tasks"
             :key="$taskIndex"
             draggable="true"
-            @dragstart="pickTask($event, $taskIndex, $columnIndex)"
+            @dragstart="dragTask($event, $taskIndex, $columnIndex)"
             @click="openTask(task.id)"
             class="task">
               <span class="w-full flex-no-shrink font-bold">{{ task.name }}</span>
@@ -62,17 +64,26 @@ export default {
     closeTask() {
       return this.$router.push({ name: 'board' })
     },
-    pickTask(event, taskIndex, columnIndex) {
+    dragTask(event, taskIndex, columnIndex) {
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.dropEffect = 'move'
       event.dataTransfer.setData('task-index', taskIndex)
       event.dataTransfer.setData('column-index', columnIndex)
+      event.dataTransfer.setData('type', 'task')
       /*
         dataTransfer only accepts string
         we could stringify the object, but we lose the reference
         so it's gonna be different object that we have in our state
       */
-
+    },
+    dropElement(event, tasks, columnIndex) {
+      const type = event.dataTransfer.getData('type');
+      if (type === 'task')
+        this.dropTask(event, tasks)
+      else if(type === 'column')
+        this.dropColumn(event, columnIndex)
+      else
+        alert('Unknown element is dropped!');
     },
     dropTask(event, tasks) {
       const columnIndex = event.dataTransfer.getData('column-index')
@@ -83,6 +94,19 @@ export default {
         from: departureTasks,
         to: tasks,
         taskIndex
+      })
+    },
+    dragColumn(event, columnIndex) {
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.dropEffect = 'move'
+      event.dataTransfer.setData('column-index', columnIndex)
+      event.dataTransfer.setData('type', 'column')
+    },
+    dropColumn(event, columnIndex) {
+      const from = event.dataTransfer.getData('column-index')
+      this.$store.commit('MOVE_COLUMN', {
+        from,
+        to: columnIndex
       })
     }
   }
