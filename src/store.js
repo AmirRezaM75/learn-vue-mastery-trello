@@ -11,17 +11,32 @@ export default new Vuex.Store({
   state: {
     board
   },
+  getters: {
+    getTask (state) {
+      return (id) => {
+        for (const column of state.board.columns) {
+          for (const task of column.tasks) {
+            if (task.id === id) return task;
+          }
+        }
+      }
+    }
+  },
   mutations: {
-    CREATE_TASK (state, { tasks, name }) {
+    CREATE_TASK(state, { tasks, name }) {
       tasks.push({
         name,
         description: '',
-        uuid: uuid()
-      })
+        id: uuid()
+      });
+    },
+    UPDATE_TASK(state, {task, key, value}) {
+      task[key] = value;
+      // Vue.set(task, key, value);
     }
   },
   actions: {
-    createTask ({ commit }, { event, tasks }) {
+    createTask({ commit }, { event, tasks }) {
       commit('CREATE_TASK', { tasks, name: event.target.value })
       event.target.value = ''
     }
