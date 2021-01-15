@@ -8,7 +8,7 @@ export default {
       tasks: [
         {
           description: '',
-          name: 'first task',
+          name: 'Read Design Patterns Book',
           id: uuid(),
           userAssigned: null
         },

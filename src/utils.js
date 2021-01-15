@@ -7,6 +7,6 @@ export function saveStatePlugin (store) {
   store.subscribe((mutation, state) => {
     // called after every mutation.
     // The mutation comes in the format of `{ type, payload }`.
-    localStorage.setItem('boards', JSON.stringify(state.boards))
+    localStorage.setItem('board', JSON.stringify(state.board))
   })
 }

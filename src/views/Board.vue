@@ -13,6 +13,12 @@
               <span class="w-full flex-no-shrink font-bold">{{ task.name }}</span>
               <span class="w-full flex-no-shrink mt-1 text-sm">{{ task.description }}</span>
           </div>
+          <input
+            type="text"
+            class="block p-2 w-full bg-transparent"
+            placeholder="+ Enter new task"
+            @keyup.enter="createTask($event, column.tasks)"
+          >
         </div>
       </div>
     </div>
@@ -23,7 +29,12 @@
 import { mapState } from 'vuex'
 
 export default {
-  computed: mapState(['board'])
+  computed: mapState(['board']),
+  methods: {
+    createTask( event, tasks ) {
+      this.$store.dispatch('createTask', { event, tasks })
+    }
+  }
 }
 </script>
 
