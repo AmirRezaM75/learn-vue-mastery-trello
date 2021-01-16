@@ -23,6 +23,12 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    CREATE_COLUMN(state, { name }) {
+      state.board.columns.push({
+        name,
+        tasks: []
+      })
+    },
     CREATE_TASK(state, {tasks, name}) {
       // we don't lose reference of tasks and it's still reactive.
       tasks.push({

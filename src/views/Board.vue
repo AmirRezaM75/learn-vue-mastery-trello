@@ -8,6 +8,15 @@
         :column="column"
         :columnIndex="$columnIndex"
       />
+      <div class="column flex">
+        <input
+          class="p-2 mr-2 flex-grow"
+          placeholder="New column name"
+          type="text"
+          v-model="newColumnName"
+          @keyup.enter="createColumn"
+        >
+      </div>
     </div>
     <div class="task-bg"
          v-if="isTaskOpen"
@@ -24,6 +33,11 @@ import BoardColumn from "@/components/BoardColumn";
 
 export default {
   components: {BoardColumn},
+  data() {
+    return {
+      newColumnName: ''
+    }
+  },
   computed: {
     ...mapState(['board']),
     isTaskOpen () {
@@ -33,6 +47,13 @@ export default {
   methods: {
     closeTask() {
       return this.$router.push({ name: 'board' })
+    },
+    createColumn() {
+      this.$store.commit('CREATE_COLUMN', {
+        name: this.newColumnName,
+      })
+
+      this.newColumnName = ''
     }
   }
 }
