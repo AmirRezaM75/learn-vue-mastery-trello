@@ -32,61 +32,22 @@
 
 <script>
 import ColumnTask from "@/components/ColumnTask";
+import ColumnOrTask from '@/mixins/columnOrTask';
+
 export default {
   name: "BoardColumn",
-  components: {ColumnTask},
-  props: {
-    board: {
-      type: Object,
-      required: true
-    },
-    column: {
-      type: Object,
-      required: true
-    },
-    columnIndex: {
-      type: Number,
-      required: true
-    }
-  },
+  components: { ColumnTask },
+  mixins: [ColumnOrTask],
   methods: {
     createTask(event, tasks) {
       this.$store.commit('CREATE_TASK', {name: event.target.value, tasks})
       event.target.value = '';
-    },
-    dropElement(event, tasks, columnIndex, taskIndex) {
-      const type = event.dataTransfer.getData('type');
-      if (type === 'task')
-        this.dropTask(event, tasks, taskIndex !== undefined ? taskIndex : tasks.length)
-      else if (type === 'column')
-        this.dropColumn(event, columnIndex)
-      else
-        alert('Unknown element is dropped!');
-    },
-    dropTask(event, toTasks, toIndex) {
-      const columnIndex = event.dataTransfer.getData('column-index')
-      const fromTasks = this.board.columns[columnIndex].tasks
-      const fromIndex = event.dataTransfer.getData('task-index')
-
-      this.$store.commit('MOVE_TASK', {
-        fromTasks,
-        fromIndex,
-        toTasks,
-        toIndex
-      })
     },
     dragColumn(event, columnIndex) {
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.dropEffect = 'move'
       event.dataTransfer.setData('column-index', columnIndex)
       event.dataTransfer.setData('type', 'column')
-    },
-    dropColumn(event, columnIndex) {
-      const from = event.dataTransfer.getData('column-index')
-      this.$store.commit('MOVE_COLUMN', {
-        from,
-        to: columnIndex
-      })
     }
   }
 }
